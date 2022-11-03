@@ -1,8 +1,8 @@
 package com.aritha.consulting.unit.testing.controller;
 
+import com.aritha.consulting.unit.testing.dto.ErrorDTO;
 import com.aritha.consulting.unit.testing.dto.ResponseDTO;
 import com.aritha.consulting.unit.testing.dto.StudentDTO;
-import com.aritha.consulting.unit.testing.repository.StudentRepository;
 import com.aritha.consulting.unit.testing.service.StudentService;
 import org.hibernate.JDBCException;
 import org.junit.jupiter.api.AfterEach;
@@ -13,12 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,16 +25,20 @@ import static org.junit.jupiter.api.Assertions.*;
  * ? @author Rohit M Lakshmikanth
  * ? @createdOn  November 03,2022 at 12:34 AM
  */
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class RestAPIControllerTest {
 
-    @Autowired
-    RestAPIController raController;
+    @InjectMocks
+    RestAPIController restAPIController;
+    @Mock
+    StudentService studentService;
+    List<StudentDTO> studentDTOList =null;
 
-    @MockBean
-    private StudentRepository studentRepository;
-    List<StudentDTO> studentDTOList;
+    @Mock
+    ResponseDTO responseDTO;
+
+    @Mock
+    ErrorDTO errorDTO;
 
     @BeforeEach
     void setUp() {
@@ -59,39 +57,31 @@ class RestAPIControllerTest {
         studentDTO.setMark(85L);
         studentDTO.setGender("male");
         studentDTOList.add(studentDTO);
-
-        //Injection to Controller
-        StudentService studentService = (StudentService) ReflectionTestUtils.getField(raController,"studentService");
-
-        // Injection to Service
-        List<StudentDTO> studentList = (List<StudentDTO>) ReflectionTestUtils.getField(studentService,"globalStudentList");
-        if(studentList==null || !studentList.isEmpty())
-            studentList = new ArrayList<>();
-        studentList.addAll(studentDTOList);
-        ReflectionTestUtils.setField(studentService,"globalStudentList",studentList);
-        ReflectionTestUtils.setField(studentService,"isActive", false);
-            ReflectionTestUtils.setField(raController,"studentService",studentService);
     }
 
     @AfterEach
     void tearDown() {
-        studentDTOList = null;
+        studentDTOList =null;
     }
 
     @Test
     void getAllStudents() {
-        ResponseEntity<?> response = raController.getAllStudents();
-        ResponseDTO resDTO = (ResponseDTO) response.getBody();
-        assertEquals(200, response.getStatusCodeValue());
-        assert resDTO != null;
-        assertEquals(studentDTOList, (List<StudentDTO>) resDTO.getResult());
-    }
+        Mockito.when(studentService.getAllStudent()).thenReturn(studentDTOList);
+        List<StudentDTO> studentList = (List<StudentDTO>) ((ResponseDTO)restAPIController.getAllStudents().getBody()).getResult();
+        assertNotNull(studentList);
+        assertEquals(studentList.get(0).getId().getClass(),Long.class);
+        assertNotEquals(studentList.get(1).getId(),"String value");
 
-    @Test
-    void searchStudent() {
-        ResponseEntity<?> response = raController.searchStudent("al");
-        ResponseDTO resDTO = (ResponseDTO) response.getBody();
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(studentDTOList, (List<StudentDTO>) resDTO.getResult());
+        Mockito.when(studentService.getAllStudent()).thenThrow(new JDBCException("Dummy Exception",new SQLException()));
+        try {
+            assertDoesNotThrow(() -> {
+                System.out.println("Doesn't throw any exception");
+            });
+        }
+        catch(Exception exception){
+            assertThrows(Exception.class, () -> {
+                System.out.println(exception.getMessage());
+            });
+        }
     }
 }
