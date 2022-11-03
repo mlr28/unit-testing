@@ -32,7 +32,7 @@ class RestAPIControllerTest {
     RestAPIController restAPIController;
     @Mock
     StudentService studentService;
-    List<StudentDTO> studentDTOList =null;
+    List<StudentDTO> studentDTOList = null;
 
     @Mock
     ResponseDTO responseDTO;
@@ -61,27 +61,20 @@ class RestAPIControllerTest {
 
     @AfterEach
     void tearDown() {
-        studentDTOList =null;
+        studentDTOList = null;
     }
 
     @Test
     void getAllStudents() {
         Mockito.when(studentService.getAllStudent()).thenReturn(studentDTOList);
-        List<StudentDTO> studentList = (List<StudentDTO>) ((ResponseDTO)restAPIController.getAllStudents().getBody()).getResult();
+        List<StudentDTO> studentList = (List<StudentDTO>) ((ResponseDTO) restAPIController.getAllStudents().getBody()).getResult();
         assertNotNull(studentList);
-        assertEquals(studentList.get(0).getId().getClass(),Long.class);
-        assertNotEquals(studentList.get(1).getId(),"String value");
+        assertEquals(studentList.get(0).getId().getClass(), Long.class);
+        assertNotEquals(studentList.get(1).getId(), "String value");
 
-        Mockito.when(studentService.getAllStudent()).thenThrow(new JDBCException("Dummy Exception",new SQLException()));
-        try {
-            assertDoesNotThrow(() -> {
-                System.out.println("Doesn't throw any exception");
-            });
-        }
-        catch(Exception exception){
-            assertThrows(Exception.class, () -> {
-                System.out.println(exception.getMessage());
-            });
-        }
+        Mockito.when(studentService.getAllStudent()).thenThrow(new JDBCException("Dummy Exception", new SQLException()));
+        assertDoesNotThrow(() -> {
+            System.out.println("Doesn't throw any exception");
+        });
     }
 }
