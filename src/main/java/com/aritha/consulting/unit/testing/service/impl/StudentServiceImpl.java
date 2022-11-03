@@ -21,47 +21,58 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     StudentRepository studentRepository;
 
+    private boolean isActive = true;
+    private List<StudentDTO> globalStudentList ;
+
     @Override
     public List<StudentDTO> getAllStudent() {
-        try {
-            List<Student> studentList = studentRepository.findAll();
-            List<StudentDTO> studentDTOList = new ArrayList<>();
-            StudentDTO studentDTO = null;
+        if(isActive) {
+            try {
+                List<Student> studentList = studentRepository.findAll();
+                List<StudentDTO> studentDTOList = new ArrayList<>();
+                StudentDTO studentDTO = null;
 
-            for (Student student : studentList) {
-                studentDTO = new StudentDTO();
-                studentDTO.setId(student.getId());
-                studentDTO.setName(student.getName());
-                studentDTO.setClassName(student.getClassName());
-                studentDTO.setMark(student.getMark());
-                studentDTO.setGender(student.getGender());
-                studentDTOList.add(studentDTO);
+                for (Student student : studentList) {
+                    studentDTO = new StudentDTO();
+                    studentDTO.setId(student.getId());
+                    studentDTO.setName(student.getName());
+                    studentDTO.setClassName(student.getClassName());
+                    studentDTO.setMark(student.getMark());
+                    studentDTO.setGender(student.getGender());
+                    studentDTOList.add(studentDTO);
+                }
+                this.globalStudentList = new ArrayList<>();
+                this.globalStudentList.addAll(studentDTOList);
+                return this.globalStudentList;
+            } catch (Exception e) {
+                return null;
             }
-            return studentDTOList;
-        } catch (Exception e) {
-            return null;
-        }
+        }else return this.globalStudentList;
     }
 
     @Override
     public List<StudentDTO> searchStudent(String search) {
-        try {
-            List<Student> studentList = studentRepository.searchStudent(search);
-            List<StudentDTO> studentDTOList = new ArrayList<>();
-            StudentDTO studentDTO = null;
+        if(isActive) {
+            try {
+                List<Student> studentList = studentRepository.searchStudent(search);
+                List<StudentDTO> studentDTOList = new ArrayList<>();
+                StudentDTO studentDTO = null;
 
-            for (Student student : studentList) {
-                studentDTO = new StudentDTO();
-                studentDTO.setId(student.getId());
-                studentDTO.setName(student.getName());
-                studentDTO.setClassName(student.getClassName());
-                studentDTO.setMark(student.getMark());
-                studentDTO.setGender(student.getGender());
-                studentDTOList.add(studentDTO);
+                for (Student student : studentList) {
+                    studentDTO = new StudentDTO();
+                    studentDTO.setId(student.getId());
+                    studentDTO.setName(student.getName());
+                    studentDTO.setClassName(student.getClassName());
+                    studentDTO.setMark(student.getMark());
+                    studentDTO.setGender(student.getGender());
+                    studentDTOList.add(studentDTO);
+                }
+                this.globalStudentList = new ArrayList<>();
+                this.globalStudentList.addAll(studentDTOList);
+                return this.globalStudentList;
+            } catch (Exception e) {
+                return null;
             }
-            return studentDTOList;
-        } catch (Exception e) {
-            return null;
-        }
+        }else return this.globalStudentList;
     }
 }

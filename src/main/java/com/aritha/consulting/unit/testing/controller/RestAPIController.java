@@ -22,7 +22,7 @@ import java.util.List;
 public class RestAPIController {
 
     @Autowired
-    StudentService studentService;
+    private StudentService studentService;
 
     @GetMapping("/students")
     public ResponseEntity<Object> getAllStudents() {
@@ -37,7 +37,7 @@ public class RestAPIController {
     }
 
     @GetMapping("/students/search")
-    public ResponseEntity<Object> getAllClass(@RequestParam("search") String search) {
+    public ResponseEntity<Object> searchStudent(@RequestParam("search") String search) {
         try {
             List<StudentDTO> studentDTOList = studentService.searchStudent(search);
             if (studentDTOList == null || studentDTOList.isEmpty())
@@ -47,16 +47,4 @@ public class RestAPIController {
             return new ResponseEntity<>("Error : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    /*@GetMapping("/subjects")
-    public ResponseEntity<Object> getAllSubjects() {
-        try {
-            List<StudentDTO> studentDTOList = studentService.getAllStudent();
-            if (studentDTOList == null || studentDTOList.isEmpty())
-                return new ResponseEntity<>(new ErrorDTO(HttpStatus.NO_CONTENT.value(), HttpStatus.NO_CONTENT.toString(), "No data found"), HttpStatus.NO_CONTENT);
-            else return new ResponseEntity<>(new ResponseDTO(studentDTOList, studentDTOList.size()), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }*/
 }
